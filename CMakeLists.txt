@@ -34,6 +34,7 @@ set(SOURCES
     parse.c
     packets.c
     output.c
+    stream.c
     gl/sha1.c
     gl/unistd.c
 )

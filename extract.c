@@ -25,7 +25,7 @@
 
 extern int verbose;
 
-int extract(FILE *input, const char *outname, enum data_type output_type) {
+int extract(struct stream *input, const char *outname, enum data_type output_type) {
   struct packet *packet;
   int offset;
   unsigned char fingerprint[20];
@@ -86,12 +86,6 @@ int extract(FILE *input, const char *outname, enum data_type output_type) {
   }
 
   output_finish();
-
-  if (input == stdin) {
-    /* Consume everything else on input */
-    while ((fgetc(input) != EOF))
-      ;
-  }
 
   return 0;
 }

@@ -20,6 +20,7 @@
 #define _OUTPUT_H_
 
 #include <sys/types.h>
+#include <stdio.h>
 
 enum data_type { AUTO, BASE16, RAW };
 

@@ -23,16 +23,17 @@
 #include "sha1.h"
 #include "packets.h"
 #include "output.h"
+#include "stream.h"
 #include "parse.h"
 
 extern int verbose;
 extern int ignore_crc_error;
 
-struct packet *parse(FILE *input, unsigned char want, unsigned char stop) {
+struct packet *parse(struct stream *input, unsigned char want, unsigned char stop) {
   int byte;
   struct packet *packet = NULL;
 
-  while ((byte = fgetc(input)) != EOF) {
+  while ((byte = stream_getc(input)) != EOF) {
     unsigned char type;
     unsigned int length;
 
@@ -46,42 +47,36 @@ struct packet *parse(FILE *input, unsigned char want, unsigned char stop) {
         type >>= 2;
 
       if (type == stop) {
-        ungetc(byte, input);
+        stream_revert(input);
         break;
       }
 
       if (byte & 0x40) {
         /* New-style packets */
-        byte = fgetc(input);
-        if (byte == EOF)
-          goto fail;
+        byte = stream_getc(input);
+		if (byte == EOF)
+		  goto fail;
 
         if (byte == 255) {
           /* 4-byte length */
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+		  if (stream_leftbyte(input) < 4)
+		  	goto fail;
+          tmp = stream_getc(input);
           length = tmp << 24;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+          tmp = stream_getc(input);
           length |= tmp << 16;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+          tmp = stream_getc(input);
           length |= tmp << 8;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+          tmp = stream_getc(input);
           length |= tmp;
         } else if (byte >= 224) {
           /* Partial body length, so fail (keys can't use
              partial body) */
-          fprintf(stderr, "Invalid partial packet encoding\n");
+          // fprintf(stderr, "Invalid partial packet encoding\n");
           goto fail;
         } else if (byte >= 192) {
           /* 2-byte length */
-          tmp = fgetc(input);
+          tmp = stream_getc(input);
           if (tmp == EOF)
             goto fail;
           length = ((byte - 192) << 8) + tmp + 192;
@@ -92,68 +87,68 @@ struct packet *parse(FILE *input, unsigned char want, unsigned char stop) {
         switch (byte & 0x03) {
         case 0:
           /* 1-byte length */
-          byte = fgetc(input);
-          if (byte == EOF)
-            goto fail;
+          byte = stream_getc(input);
+		  if (byte == EOF)
+			goto fail;
           length = byte;
           break;
 
         case 1:
           /* 2-byte length */
-          byte = fgetc(input);
-          if (byte == EOF)
-            goto fail;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+		  if (stream_leftbyte(input) < 2)
+		  	goto fail;
+          byte = stream_getc(input);
+          tmp = stream_getc(input);
           length = byte << 8;
           length |= tmp;
           break;
 
         case 2:
           /* 4-byte length */
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+		  if (stream_leftbyte(input) < 4)
+		  	goto fail;
+          tmp = stream_getc(input);
           length = tmp << 24;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+          tmp = stream_getc(input);
           length |= tmp << 16;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+          tmp = stream_getc(input);
           length |= tmp << 8;
-          tmp = fgetc(input);
-          if (tmp == EOF)
-            goto fail;
+          tmp = stream_getc(input);
           length |= tmp;
           break;
 
         default:
-          fprintf(stderr, "Error: unable to parse old-style length\n");
+          // fprintf(stderr, "Error: unable to parse old-style length\n");
           goto fail;
         }
       }
 
-      if (verbose > 1)
-        fprintf(stderr, "Found packet of type %d, length %d\n", type, length);
+      // if (verbose > 1)
+      //   fprintf(stderr, "Found packet of type %d, length %d\n", type, length);
     } else {
-      fprintf(stderr, "Error: unable to parse OpenPGP packets"
-                      " (is this armored data?)\n");
+      // fprintf(stderr, "Error: unable to parse OpenPGP packets"
+      //                 " (is this armored data?)\n");
       goto fail;
     }
 
     if (want == 0 || type == want) {
-      packet = xmalloc(sizeof(*packet));
+      packet = malloc(sizeof(*packet));
+	  if (packet == NULL) goto fail;
       packet->type = type;
-      packet->buf = xmalloc(length);
+      packet->buf = malloc(length);
+	  if (packet->buf == NULL) {
+	  	free(packet);
+	  	goto fail;
+	  }
       packet->len = length;
       packet->size = length;
-      if (fread(packet->buf, 1, packet->len, input) < packet->len) {
-        fprintf(stderr, "Short read on packet type %d\n", type);
-        goto fail;
-      }
+	  if (stream_leftbyte(input) < (int) packet->len)
+	  	goto fail;
+	  stream_read(packet->buf, 1, packet->len, input);
+      // if (fread(packet->buf, 1, packet->len, input) < packet->len) {
+      //   fprintf(stderr, "Short read on packet type %d\n", type);
+      //   goto fail;
+      // }
       break;
     } else {
       /* We don't want it, so skip the packet.  We don't use fseek
@@ -163,7 +158,7 @@ struct packet *parse(FILE *input, unsigned char want, unsigned char stop) {
       size_t i;
 
       for (i = 0; i < length; i++)
-        fgetc(input);
+        stream_getc(input);
     }
   }
 
@@ -297,7 +292,7 @@ ssize_t extract_secrets(struct packet *packet) {
   return offset;
 }
 
-struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
+struct packet *read_secrets_file(struct stream *secrets, enum data_type input_type) {
   struct packet *packet = NULL;
   int final_crc = 0;
   unsigned long my_crc = 0;
@@ -306,11 +301,11 @@ struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
     unsigned char buffer[1024];
     size_t got;
 
-    while ((got = fread(buffer, 1, 1024, secrets)))
+    while ((got = stream_read(buffer, 1, 1024, secrets)))
       packet = append_packet(packet, buffer, got);
 
-    if (got == 0 && !feof(secrets)) {
-      fprintf(stderr, "Error: unable to read secrets file\n");
+    if (got == 0 && !stream_eof(secrets)) {
+      // fprintf(stderr, "Error: unable to read secrets file\n");
       free_packet(packet);
       return NULL;
     }
@@ -327,7 +322,7 @@ struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
     char line[1024];
     unsigned int next_linenum = 1;
 
-    while (fgets(line, 1024, secrets)) {
+    while (stream_gets(line, 1024, secrets)) {
       unsigned int linenum, did_digit = 0;
       unsigned long line_crc = CRC24_INIT;
       char *tok;
@@ -337,8 +332,8 @@ struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
 
       linenum = atoi(line);
       if (linenum != next_linenum) {
-        fprintf(stderr, "Error: missing line number %u (saw %u)\n",
-                next_linenum, linenum);
+        // fprintf(stderr, "Error: missing line number %u (saw %u)\n",
+        //         next_linenum, linenum);
         free_packet(packet);
         return NULL;
       } else
@@ -363,10 +358,10 @@ struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
             if (sscanf(tok, "%06lX", &new_crc)) {
               if (did_digit) {
                 if ((new_crc & 0xFFFFFFL) != (line_crc & 0xFFFFFFL)) {
-                  fprintf(stderr,
-                          "CRC on line %d does not"
-                          " match (%06lX!=%06lX)\n",
-                          linenum, new_crc & 0xFFFFFFL, line_crc & 0xFFFFFFL);
+                  // fprintf(stderr,
+                  //         "CRC on line %d does not"
+                  //         " match (%06lX!=%06lX)\n",
+                  //         linenum, new_crc & 0xFFFFFFL, line_crc & 0xFFFFFFL);
                   if (!ignore_crc_error) {
                     free_packet(packet);
                     return NULL;
@@ -391,7 +386,7 @@ struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
           tok = next;
         }
       } else {
-        fprintf(stderr, "No colon ':' found in line %u\n", linenum);
+        // fprintf(stderr, "No colon ':' found in line %u\n", linenum);
         free_packet(packet);
         return NULL;
       }
@@ -404,15 +399,15 @@ struct packet *read_secrets_file(FILE *secrets, enum data_type input_type) {
     do_crc24(&all_crc, packet->buf, packet->len);
 
     if ((my_crc & 0xFFFFFFL) != (all_crc & 0xFFFFFFL)) {
-      fprintf(stderr, "CRC of secret does not match (%06lX!=%06lX)\n",
-              my_crc & 0xFFFFFFL, all_crc & 0xFFFFFFL);
+      // fprintf(stderr, "CRC of secret does not match (%06lX!=%06lX)\n",
+      //         my_crc & 0xFFFFFFL, all_crc & 0xFFFFFFL);
       if (!ignore_crc_error) {
         free_packet(packet);
         return NULL;
       }
     }
   } else {
-    fprintf(stderr, "CRC of secret is missing\n");
+    // fprintf(stderr, "CRC of secret is missing\n");
     if (!ignore_crc_error) {
       free_packet(packet);
       return NULL;

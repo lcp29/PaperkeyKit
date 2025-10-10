@@ -27,6 +27,7 @@
 #include "output.h"
 #include "extract.h"
 #include "restore.h"
+#include "stream.h"
 
 int verbose = 0, ignore_crc_error = 0;
 unsigned int output_width = 78;
@@ -86,18 +87,11 @@ static void usage(void) {
 
 int main(int argc, char *argv[]) {
   int arg, err;
-  FILE *secret_key, *secrets, *pubring = NULL;
+  struct stream *secret_key, *secrets, *pubring = NULL;
+  FILE *secret_key_file, *secrets_file, *pubring_file = NULL;
   const char *outname = NULL;
   enum data_type output_type = BASE16;
   enum data_type input_type = AUTO;
-
-  set_binary_mode(stdin);
-
-  secret_key = secrets = stdin;
-
-  /* Force the umask to go-rwx, as we are going to be creating files
-     that contain secret key material. */
-  umask(077);
 
   while ((arg = getopt_long(argc, argv, "hVvo:", long_options, NULL)) != -1)
     switch (arg) {
@@ -157,28 +151,31 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPT_SECRET_KEY:
-      secret_key = fopen(optarg, "rb");
-      if (!secret_key) {
+      secret_key_file = fopen(optarg, "rb");
+      if (!secret_key_file) {
         fprintf(stderr, "Unable to open %s: %s\n", optarg, strerror(errno));
         exit(1);
       }
+      secret_key = create_stream(secret_key_file);
       break;
 
     case OPT_PUBRING:
-      pubring = fopen(optarg, "rb");
-      if (!pubring) {
+      pubring_file = fopen(optarg, "rb");
+      if (!pubring_file) {
         fprintf(stderr, "Unable to open pubring %s: %s\n", optarg,
                 strerror(errno));
         exit(1);
       }
+      pubring = create_stream(pubring_file);
       break;
 
     case OPT_SECRETS:
-      secrets = fopen(optarg, "rb");
-      if (!secrets) {
+      secrets_file = fopen(optarg, "rb");
+      if (!secrets_file) {
         fprintf(stderr, "Unable to open %s: %s\n", optarg, strerror(errno));
         exit(1);
       }
+      secrets = create_stream(secrets_file);
       break;
 
     case OPT_IGNORE_CRC_ERROR:

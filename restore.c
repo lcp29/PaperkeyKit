@@ -94,12 +94,12 @@ static void free_keys(struct key *key) {
   }
 }
 
-int restore(FILE *pubring, FILE *secrets, enum data_type input_type,
+int restore(struct stream *pubring, struct stream *secrets, enum data_type input_type,
             const char *outname) {
   struct packet *secret;
 
   if (input_type == AUTO) {
-    int test = fgetc(secrets);
+    int test = stream_getc(secrets);
 
     if (test == EOF) {
       fprintf(stderr, "Unable to check type of secrets file\n");
@@ -109,7 +109,7 @@ int restore(FILE *pubring, FILE *secrets, enum data_type input_type,
     else
       input_type = RAW;
 
-    ungetc(test, secrets);
+    secrets->pos--;
   }
 
   secret = read_secrets_file(secrets, input_type);
@@ -154,6 +154,7 @@ int restore(FILE *pubring, FILE *secrets, enum data_type input_type,
               output_packet(pubkey);
               output_packet(keyidx->packet);
             }
+			
           }
         } else if (did_pubkey) {
           /* Copy the usual user ID, sigs, etc, so the key is
