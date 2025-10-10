@@ -23,9 +23,6 @@
 
 #include <config.h>
 
-#if HAVE_OPENSSL_SHA1
-# define GL_OPENSSL_INLINE _GL_EXTERN_INLINE
-#endif
 #include "sha1.h"
 
 #include <stdalign.h>
@@ -49,15 +46,14 @@
 # error "invalid BLOCKSIZE"
 #endif
 
-#if ! HAVE_OPENSSL_SHA1
 /* This array contains the bytes used to pad the buffer to the next
-   64-byte boundary.  (RFC 1321, 3.1: Step 1)  */
+    64-byte boundary.  (RFC 1321, 3.1: Step 1)  */
 static const unsigned char fillbuf[64] = { 0x80, 0 /* , 0, 0, ...  */ };
 
 
 /* Take a pointer to a 160 bit block of data (five 32 bit ints) and
-   initialize it to the start constants of the SHA1 algorithm.  This
-   must be called before using hash in the call to sha1_hash.  */
+    initialize it to the start constants of the SHA1 algorithm.  This
+    must be called before using hash in the call to sha1_hash.  */
 void
 sha1_init_ctx (struct sha1_ctx *ctx)
 {
@@ -72,8 +68,8 @@ sha1_init_ctx (struct sha1_ctx *ctx)
 }
 
 /* Copy the 4 byte value from v into the memory location pointed to by *cp,
-   If your architecture allows unaligned access this is equivalent to
-   * (uint32_t *) cp = v  */
+    If your architecture allows unaligned access this is equivalent to
+    * (uint32_t *) cp = v  */
 static void
 set_uint32 (char *cp, uint32_t v)
 {
@@ -81,7 +77,7 @@ set_uint32 (char *cp, uint32_t v)
 }
 
 /* Put result from CTX in first 20 bytes following RESBUF.  The result
-   must be in little endian byte order.  */
+    must be in little endian byte order.  */
 void *
 sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf)
 {
@@ -96,7 +92,7 @@ sha1_read_ctx (const struct sha1_ctx *ctx, void *resbuf)
 }
 
 /* Process the remaining bytes in the internal buffer and the usual
-   prolog according to the standard and write the result to RESBUF.  */
+    prolog according to the standard and write the result to RESBUF.  */
 void *
 sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf)
 {
@@ -120,7 +116,6 @@ sha1_finish_ctx (struct sha1_ctx *ctx, void *resbuf)
 
   return sha1_read_ctx (ctx, resbuf);
 }
-#endif
 
 /* Compute SHA1 message digest for bytes read from STREAM.  The
    resulting message digest number will be written into the 16 bytes
@@ -195,11 +190,10 @@ sha1_stream (FILE *stream, void *resblock)
   return 0;
 }
 
-#if ! HAVE_OPENSSL_SHA1
 /* Compute SHA1 message digest for LEN bytes beginning at BUFFER.  The
-   result is always in little endian byte order, so that a byte-wise
-   output yields to the wanted ASCII representation of the message
-   digest.  */
+    result is always in little endian byte order, so that a byte-wise
+    output yields to the wanted ASCII representation of the message
+    digest.  */
 void *
 sha1_buffer (const char *buffer, size_t len, void *resblock)
 {
@@ -219,7 +213,7 @@ void
 sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 {
   /* When we already have some bits in our internal buffer concatenate
-     both inputs first.  */
+      both inputs first.  */
   if (ctx->buflen != 0)
     {
       size_t left_over = ctx->buflen;
@@ -234,7 +228,7 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 
           ctx->buflen &= 63;
           /* The regions in the following copy operation cannot overlap,
-             because ctx->buflen < 64 ≤ (left_over + add) & ~63.  */
+              because ctx->buflen < 64 ≤ (left_over + add) & ~63.  */
           memcpy (ctx->buffer,
                   &((char *) ctx->buffer)[(left_over + add) & ~63],
                   ctx->buflen);
@@ -277,7 +271,7 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
           sha1_process_block (ctx->buffer, 64, ctx);
           left_over -= 64;
           /* The regions in the following copy operation cannot overlap,
-             because left_over ≤ 64.  */
+              because left_over ≤ 64.  */
           memcpy (ctx->buffer, &ctx->buffer[16], left_over);
         }
       ctx->buflen = left_over;
@@ -299,8 +293,8 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
 #define F4(B,C,D) (B ^ C ^ D)
 
 /* Process LEN bytes of BUFFER, accumulating context into CTX.
-   It is assumed that LEN % 64 == 0.
-   Most of this code comes from GnuPG's cipher/sha1.c.  */
+    It is assumed that LEN % 64 == 0.
+    Most of this code comes from GnuPG's cipher/sha1.c.  */
 
 void
 sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
@@ -317,23 +311,23 @@ sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
   uint32_t lolen = len;
 
   /* First increment the byte count.  RFC 1321 specifies the possible
-     length of the file up to 2^64 bits.  Here we only compute the
-     number of bytes.  Do a double word increment.  */
+      length of the file up to 2^64 bits.  Here we only compute the
+      number of bytes.  Do a double word increment.  */
   ctx->total[0] += lolen;
   ctx->total[1] += (len >> 31 >> 1) + (ctx->total[0] < lolen);
 
 #define rol(x, n) (((x) << (n)) | ((uint32_t) (x) >> (32 - (n))))
 
 #define M(I) ( tm =   x[I&0x0f] ^ x[(I-14)&0x0f] \
-                    ^ x[(I-8)&0x0f] ^ x[(I-3)&0x0f] \
-               , (x[I&0x0f] = rol(tm, 1)) )
+                     ^ x[(I-8)&0x0f] ^ x[(I-3)&0x0f] \
+                , (x[I&0x0f] = rol(tm, 1)) )
 
 #define R(A,B,C,D,E,F,K,M)  do { E += rol( A, 5 )     \
-                                      + F( B, C, D )  \
-                                      + K             \
-                                      + M;            \
-                                 B = rol( B, 30 );    \
-                               } while(0)
+                                       + F( B, C, D )  \
+                                       + K             \
+                                       + M;            \
+                                  B = rol( B, 30 );    \
+                                } while(0)
 
   while (words < endp)
     {
@@ -433,4 +427,3 @@ sha1_process_block (const void *buffer, size_t len, struct sha1_ctx *ctx)
       e = ctx->E += e;
     }
 }
-#endif
