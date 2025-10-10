@@ -94,8 +94,8 @@ static void free_keys(struct key *key) {
   }
 }
 
-int restore(struct stream *pubring, struct stream *secrets, enum data_type input_type,
-            const char *outname) {
+int restore(struct stream *pubring, struct stream *secrets,
+            enum data_type input_type, const char *outname) {
   struct packet *secret;
 
   if (input_type == AUTO) {
@@ -154,7 +154,6 @@ int restore(struct stream *pubring, struct stream *secrets, enum data_type input
               output_packet(pubkey);
               output_packet(keyidx->packet);
             }
-			
           }
         } else if (did_pubkey) {
           /* Copy the usual user ID, sigs, etc, so the key is

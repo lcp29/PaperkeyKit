@@ -25,7 +25,8 @@
 
 extern int verbose;
 
-int extract(struct stream *input, const char *outname, enum data_type output_type) {
+int extract(struct stream *input, const char *outname,
+            enum data_type output_type) {
   struct packet *packet;
   int offset;
   unsigned char fingerprint[20];

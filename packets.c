@@ -23,6 +23,7 @@
 #include "sha1.h"
 #include "output.h"
 #include "packets.h"
+#include <string.h>
 
 extern int verbose;
 

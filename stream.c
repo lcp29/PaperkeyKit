@@ -53,8 +53,9 @@ char *stream_gets(char *buf, size_t n, struct stream *stream) {
 }
 
 struct stream *create_stream(FILE *file) {
-  if (file == NULL) return NULL;
-  struct stream* s = malloc(sizeof(struct stream));
+  if (file == NULL)
+    return NULL;
+  struct stream *s = malloc(sizeof(struct stream));
   fseek(file, 0, SEEK_END);
   s->size = ftell(file);
   fseek(file, 0, SEEK_SET);

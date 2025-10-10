@@ -19,10 +19,10 @@
 #ifndef _RESTORE_H_
 #define _RESTORE_H_
 
-#include "stream.h"
 #include "output.h"
+#include "stream.h"
 
-int restore(struct stream *pubring, struct stream *secrets, enum data_type input_type,
-            const char *outname);
+int restore(struct stream *pubring, struct stream *secrets,
+            enum data_type input_type, const char *outname);
 
 #endif /* !_RESTORE_H_ */

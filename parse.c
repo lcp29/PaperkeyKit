@@ -29,7 +29,8 @@
 extern int verbose;
 extern int ignore_crc_error;
 
-struct packet *parse(struct stream *input, unsigned char want, unsigned char stop) {
+struct packet *parse(struct stream *input, unsigned char want,
+                     unsigned char stop) {
   int byte;
   struct packet *packet = NULL;
 
@@ -54,13 +55,13 @@ struct packet *parse(struct stream *input, unsigned char want, unsigned char sto
       if (byte & 0x40) {
         /* New-style packets */
         byte = stream_getc(input);
-		if (byte == EOF)
-		  goto fail;
+        if (byte == EOF)
+          goto fail;
 
         if (byte == 255) {
           /* 4-byte length */
-		  if (stream_leftbyte(input) < 4)
-		  	goto fail;
+          if (stream_leftbyte(input) < 4)
+            goto fail;
           tmp = stream_getc(input);
           length = tmp << 24;
           tmp = stream_getc(input);
@@ -88,15 +89,15 @@ struct packet *parse(struct stream *input, unsigned char want, unsigned char sto
         case 0:
           /* 1-byte length */
           byte = stream_getc(input);
-		  if (byte == EOF)
-			goto fail;
+          if (byte == EOF)
+            goto fail;
           length = byte;
           break;
 
         case 1:
           /* 2-byte length */
-		  if (stream_leftbyte(input) < 2)
-		  	goto fail;
+          if (stream_leftbyte(input) < 2)
+            goto fail;
           byte = stream_getc(input);
           tmp = stream_getc(input);
           length = byte << 8;
@@ -105,8 +106,8 @@ struct packet *parse(struct stream *input, unsigned char want, unsigned char sto
 
         case 2:
           /* 4-byte length */
-		  if (stream_leftbyte(input) < 4)
-		  	goto fail;
+          if (stream_leftbyte(input) < 4)
+            goto fail;
           tmp = stream_getc(input);
           length = tmp << 24;
           tmp = stream_getc(input);
@@ -124,7 +125,8 @@ struct packet *parse(struct stream *input, unsigned char want, unsigned char sto
       }
 
       // if (verbose > 1)
-      //   fprintf(stderr, "Found packet of type %d, length %d\n", type, length);
+      //   fprintf(stderr, "Found packet of type %d, length %d\n", type,
+      //   length);
     } else {
       // fprintf(stderr, "Error: unable to parse OpenPGP packets"
       //                 " (is this armored data?)\n");
@@ -133,18 +135,19 @@ struct packet *parse(struct stream *input, unsigned char want, unsigned char sto
 
     if (want == 0 || type == want) {
       packet = malloc(sizeof(*packet));
-	  if (packet == NULL) goto fail;
+      if (packet == NULL)
+        goto fail;
       packet->type = type;
       packet->buf = malloc(length);
-	  if (packet->buf == NULL) {
-	  	free(packet);
-	  	goto fail;
-	  }
+      if (packet->buf == NULL) {
+        free(packet);
+        goto fail;
+      }
       packet->len = length;
       packet->size = length;
-	  if (stream_leftbyte(input) < (int) packet->len)
-	  	goto fail;
-	  stream_read(packet->buf, 1, packet->len, input);
+      if (stream_leftbyte(input) < (int)packet->len)
+        goto fail;
+      stream_read(packet->buf, 1, packet->len, input);
       // if (fread(packet->buf, 1, packet->len, input) < packet->len) {
       //   fprintf(stderr, "Short read on packet type %d\n", type);
       //   goto fail;
@@ -292,7 +295,8 @@ ssize_t extract_secrets(struct packet *packet) {
   return offset;
 }
 
-struct packet *read_secrets_file(struct stream *secrets, enum data_type input_type) {
+struct packet *read_secrets_file(struct stream *secrets,
+                                 enum data_type input_type) {
   struct packet *packet = NULL;
   int final_crc = 0;
   unsigned long my_crc = 0;
@@ -361,7 +365,8 @@ struct packet *read_secrets_file(struct stream *secrets, enum data_type input_ty
                   // fprintf(stderr,
                   //         "CRC on line %d does not"
                   //         " match (%06lX!=%06lX)\n",
-                  //         linenum, new_crc & 0xFFFFFFL, line_crc & 0xFFFFFFL);
+                  //         linenum, new_crc & 0xFFFFFFL, line_crc &
+                  //         0xFFFFFFL);
                   if (!ignore_crc_error) {
                     free_packet(packet);
                     return NULL;

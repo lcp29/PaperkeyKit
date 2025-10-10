@@ -19,8 +19,8 @@
 #ifndef _OUTPUT_H_
 #define _OUTPUT_H_
 
-#include <sys/types.h>
 #include <stdio.h>
+#include <sys/types.h>
 
 enum data_type { AUTO, BASE16, RAW };
 
