@@ -20,7 +20,9 @@
 /* #undef BITSIZEOF_WINT_T */
 
 /* The copyright string */
-#define COPYRIGHT_STRING "Copyright (C) 2007, 2008, 2009, 2012, 2013, 2016, 2017, 2018 David Shaw <dshaw@jabberwocky.com>"
+#define COPYRIGHT_STRING                                                       \
+  "Copyright (C) 2007, 2008, 2009, 2012, 2013, 2016, 2017, 2018 David Shaw "   \
+  "<dshaw@jabberwocky.com>"
 
 /* Define to 1 if you have the <getopt.h> header file. */
 #define HAVE_GETOPT_H 1
@@ -273,59 +275,59 @@
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
-# define _ALL_SOURCE 1
+#define _ALL_SOURCE 1
 #endif
 /* Enable general extensions on macOS.  */
 #ifndef _DARWIN_C_SOURCE
-# define _DARWIN_C_SOURCE 1
+#define _DARWIN_C_SOURCE 1
 #endif
 /* Enable GNU extensions on systems that have them.  */
 #ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
+#define _GNU_SOURCE 1
 #endif
 /* Enable NetBSD extensions on NetBSD.  */
 #ifndef _NETBSD_SOURCE
-# define _NETBSD_SOURCE 1
+#define _NETBSD_SOURCE 1
 #endif
 /* Enable OpenBSD extensions on NetBSD.  */
 #ifndef _OPENBSD_SOURCE
-# define _OPENBSD_SOURCE 1
+#define _OPENBSD_SOURCE 1
 #endif
 /* Enable threading extensions on Solaris.  */
 #ifndef _POSIX_PTHREAD_SEMANTICS
-# define _POSIX_PTHREAD_SEMANTICS 1
+#define _POSIX_PTHREAD_SEMANTICS 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-5:2014.  */
 #ifndef __STDC_WANT_IEC_60559_ATTRIBS_EXT__
-# define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
+#define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-1:2014.  */
 #ifndef __STDC_WANT_IEC_60559_BFP_EXT__
-# define __STDC_WANT_IEC_60559_BFP_EXT__ 1
+#define __STDC_WANT_IEC_60559_BFP_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-2:2015.  */
 #ifndef __STDC_WANT_IEC_60559_DFP_EXT__
-# define __STDC_WANT_IEC_60559_DFP_EXT__ 1
+#define __STDC_WANT_IEC_60559_DFP_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-4:2015.  */
 #ifndef __STDC_WANT_IEC_60559_FUNCS_EXT__
-# define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
+#define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-3:2015.  */
 #ifndef __STDC_WANT_IEC_60559_TYPES_EXT__
-# define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
+#define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TR 24731-2:2010.  */
 #ifndef __STDC_WANT_LIB_EXT2__
-# define __STDC_WANT_LIB_EXT2__ 1
+#define __STDC_WANT_LIB_EXT2__ 1
 #endif
 /* Enable extensions specified by ISO/IEC 24747:2009.  */
 #ifndef __STDC_WANT_MATH_SPEC_FUNCS__
-# define __STDC_WANT_MATH_SPEC_FUNCS__ 1
+#define __STDC_WANT_MATH_SPEC_FUNCS__ 1
 #endif
 /* Enable extensions on HP NonStop.  */
 #ifndef _TANDEM_SOURCE
-# define _TANDEM_SOURCE 1
+#define _TANDEM_SOURCE 1
 #endif
 /* Enable X/Open extensions if necessary.  HP-UX 11.11 defines
    mbstate_t only if _XOPEN_SOURCE is defined to 500, regardless of
@@ -335,9 +337,8 @@
 #endif
 /* Enable general extensions on Solaris.  */
 #ifndef __EXTENSIONS__
-# define __EXTENSIONS__ 1
+#define __EXTENSIONS__ 1
 #endif
-
 
 /* Version number of package */
 #define VERSION "1.6"
@@ -353,13 +354,13 @@
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */
 #if defined AC_APPLE_UNIVERSAL_BUILD
-# if defined __BIG_ENDIAN__
-#  define WORDS_BIGENDIAN 1
-# endif
+#if defined __BIG_ENDIAN__
+#define WORDS_BIGENDIAN 1
+#endif
 #else
-# ifndef WORDS_BIGENDIAN
+#ifndef WORDS_BIGENDIAN
 /* #  undef WORDS_BIGENDIAN */
-# endif
+#endif
 #endif
 
 /* Define to 1 if on MINIX. */
@@ -369,18 +370,17 @@
 #define _NETBSD_SOURCE 1
 
 /* The _Noreturn keyword of C11.  */
-#if ! (defined _Noreturn \
-       || (defined __STDC_VERSION__ && 201112 <= __STDC_VERSION__))
-# if (3 <= __GNUC__ || (__GNUC__ == 2 && 8 <= __GNUC_MINOR__) \
-      || 0x5110 <= __SUNPRO_C)
-#  define _Noreturn __attribute__ ((__noreturn__))
-# elif defined _MSC_VER && 1200 <= _MSC_VER
-#  define _Noreturn __declspec (noreturn)
-# else
-#  define _Noreturn
-# endif
+#if !(defined _Noreturn ||                                                     \
+      (defined __STDC_VERSION__ && 201112 <= __STDC_VERSION__))
+#if (3 <= __GNUC__ || (__GNUC__ == 2 && 8 <= __GNUC_MINOR__) ||                \
+     0x5110 <= __SUNPRO_C)
+#define _Noreturn __attribute__((__noreturn__))
+#elif defined _MSC_VER && 1200 <= _MSC_VER
+#define _Noreturn __declspec(noreturn)
+#else
+#define _Noreturn
 #endif
-
+#endif
 
 /* Define to 2 if the system does not provide POSIX.1 features except with
    this defined. */
@@ -436,40 +436,37 @@
    OS X 10.9 has a macro __header_inline indicating the bug is fixed for C and
    for clang but remains for g++; see <https://trac.macports.org/ticket/41033>.
    Assume DragonFly and FreeBSD will be similar.  */
-#if (((defined __APPLE__ && defined __MACH__) \
-      || defined __DragonFly__ || defined __FreeBSD__) \
-     && (defined __header_inline \
-         ? (defined __cplusplus && defined __GNUC_STDC_INLINE__ \
-            && ! defined __clang__) \
-         : ((! defined _DONT_USE_CTYPE_INLINE_ \
-             && (defined __GNUC__ || defined __cplusplus)) \
-            || (defined _FORTIFY_SOURCE && 0 < _FORTIFY_SOURCE \
-                && defined __GNUC__ && ! defined __cplusplus))))
-# define _GL_EXTERN_INLINE_STDHEADER_BUG
+#if (((defined __APPLE__ && defined __MACH__) || defined __DragonFly__ ||      \
+      defined __FreeBSD__) &&                                                  \
+     (defined __header_inline                                                  \
+          ? (defined __cplusplus && defined __GNUC_STDC_INLINE__ &&            \
+             !defined __clang__)                                               \
+          : ((!defined _DONT_USE_CTYPE_INLINE_ &&                              \
+              (defined __GNUC__ || defined __cplusplus)) ||                    \
+             (defined _FORTIFY_SOURCE && 0 < _FORTIFY_SOURCE &&                \
+              defined __GNUC__ && !defined __cplusplus))))
+#define _GL_EXTERN_INLINE_STDHEADER_BUG
 #endif
-#if ((__GNUC__ \
-      ? defined __GNUC_STDC_INLINE__ && __GNUC_STDC_INLINE__ \
-      : (199901L <= __STDC_VERSION__ \
-         && !defined __HP_cc \
-         && !defined __PGI \
-         && !(defined __SUNPRO_C && __STDC__))) \
-     && !defined _GL_EXTERN_INLINE_STDHEADER_BUG)
-# define _GL_INLINE inline
-# define _GL_EXTERN_INLINE extern inline
-# define _GL_EXTERN_INLINE_IN_USE
-#elif (2 < __GNUC__ + (7 <= __GNUC_MINOR__) && !defined __STRICT_ANSI__ \
-       && !defined _GL_EXTERN_INLINE_STDHEADER_BUG)
-# if defined __GNUC_GNU_INLINE__ && __GNUC_GNU_INLINE__
-   /* __gnu_inline__ suppresses a GCC 4.2 diagnostic.  */
-#  define _GL_INLINE extern inline __attribute__ ((__gnu_inline__))
-# else
-#  define _GL_INLINE extern inline
-# endif
-# define _GL_EXTERN_INLINE extern
-# define _GL_EXTERN_INLINE_IN_USE
+#if ((__GNUC__ ? defined __GNUC_STDC_INLINE__ && __GNUC_STDC_INLINE__          \
+               : (199901L <= __STDC_VERSION__ && !defined __HP_cc &&           \
+                  !defined __PGI && !(defined __SUNPRO_C && __STDC__))) &&     \
+     !defined _GL_EXTERN_INLINE_STDHEADER_BUG)
+#define _GL_INLINE inline
+#define _GL_EXTERN_INLINE extern inline
+#define _GL_EXTERN_INLINE_IN_USE
+#elif (2 < __GNUC__ + (7 <= __GNUC_MINOR__) && !defined __STRICT_ANSI__ &&     \
+       !defined _GL_EXTERN_INLINE_STDHEADER_BUG)
+#if defined __GNUC_GNU_INLINE__ && __GNUC_GNU_INLINE__
+/* __gnu_inline__ suppresses a GCC 4.2 diagnostic.  */
+#define _GL_INLINE extern inline __attribute__((__gnu_inline__))
 #else
-# define _GL_INLINE static _GL_UNUSED
-# define _GL_EXTERN_INLINE static _GL_UNUSED
+#define _GL_INLINE extern inline
+#endif
+#define _GL_EXTERN_INLINE extern
+#define _GL_EXTERN_INLINE_IN_USE
+#else
+#define _GL_INLINE static _GL_UNUSED
+#define _GL_EXTERN_INLINE static _GL_UNUSED
 #endif
 
 /* In GCC 4.6 (inclusive) to 5.1 (exclusive),
@@ -479,22 +476,21 @@
    <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54113> and
    <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63877>.  */
 #if __GNUC__ == 4 && 6 <= __GNUC_MINOR__
-# if defined __GNUC_STDC_INLINE__ && __GNUC_STDC_INLINE__
-#  define _GL_INLINE_HEADER_CONST_PRAGMA
-# else
-#  define _GL_INLINE_HEADER_CONST_PRAGMA \
-     _Pragma ("GCC diagnostic ignored \"-Wsuggest-attribute=const\"")
-# endif
-# define _GL_INLINE_HEADER_BEGIN \
-    _Pragma ("GCC diagnostic push") \
-    _Pragma ("GCC diagnostic ignored \"-Wmissing-prototypes\"") \
-    _Pragma ("GCC diagnostic ignored \"-Wmissing-declarations\"") \
-    _GL_INLINE_HEADER_CONST_PRAGMA
-# define _GL_INLINE_HEADER_END \
-    _Pragma ("GCC diagnostic pop")
+#if defined __GNUC_STDC_INLINE__ && __GNUC_STDC_INLINE__
+#define _GL_INLINE_HEADER_CONST_PRAGMA
 #else
-# define _GL_INLINE_HEADER_BEGIN
-# define _GL_INLINE_HEADER_END
+#define _GL_INLINE_HEADER_CONST_PRAGMA                                         \
+  _Pragma("GCC diagnostic ignored \"-Wsuggest-attribute=const\"")
+#endif
+#define _GL_INLINE_HEADER_BEGIN                                                \
+  _Pragma("GCC diagnostic push")                                               \
+      _Pragma("GCC diagnostic ignored \"-Wmissing-prototypes\"")               \
+          _Pragma("GCC diagnostic ignored \"-Wmissing-declarations\"")         \
+              _GL_INLINE_HEADER_CONST_PRAGMA
+#define _GL_INLINE_HEADER_END _Pragma("GCC diagnostic pop")
+#else
+#define _GL_INLINE_HEADER_BEGIN
+#define _GL_INLINE_HEADER_END
 #endif
 
 /* Work around a bug in Apple GCC 4.0.1 build 5465: In C99 mode, it supports
@@ -503,8 +499,10 @@
    __APPLE__ && __MACH__ test for Mac OS X.
    __APPLE_CC__ tests for the Apple compiler and its version.
    __STDC_VERSION__ tests for the C99 mode.  */
-#if defined __APPLE__ && defined __MACH__ && __APPLE_CC__ >= 5465 && !defined __cplusplus && __STDC_VERSION__ >= 199901L && !defined __GNUC_STDC_INLINE__
-# define __GNUC_STDC_INLINE__ 1
+#if defined __APPLE__ && defined __MACH__ && __APPLE_CC__ >= 5465 &&           \
+    !defined __cplusplus && __STDC_VERSION__ >= 199901L &&                     \
+    !defined __GNUC_STDC_INLINE__
+#define __GNUC_STDC_INLINE__ 1
 #endif
 
 /* Define to `int' if <sys/types.h> does not define. */
@@ -523,9 +521,9 @@
     be used.  This helps to reduce warnings, such as from
     GCC -Wunused-parameter.  */
 #if __GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 7)
-# define _GL_UNUSED __attribute__ ((__unused__))
+#define _GL_UNUSED __attribute__((__unused__))
 #else
-# define _GL_UNUSED
+#define _GL_UNUSED
 #endif
 /* The name _UNUSED_PARAMETER_ is an earlier spelling, although the name
    is a misnomer outside of parameter lists.  */
@@ -534,24 +532,23 @@
 /* gcc supports the "unused" attribute on possibly unused labels, and
    g++ has since version 4.5.  Note to support C++ as well as C,
    _GL_UNUSED_LABEL should be used with a trailing ;  */
-#if !defined __cplusplus || __GNUC__ > 4 \
-    || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-# define _GL_UNUSED_LABEL _GL_UNUSED
+#if !defined __cplusplus || __GNUC__ > 4 ||                                    \
+    (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
+#define _GL_UNUSED_LABEL _GL_UNUSED
 #else
-# define _GL_UNUSED_LABEL
+#define _GL_UNUSED_LABEL
 #endif
 
 /* The __pure__ attribute was added in gcc 2.96.  */
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 96)
-# define _GL_ATTRIBUTE_PURE __attribute__ ((__pure__))
+#define _GL_ATTRIBUTE_PURE __attribute__((__pure__))
 #else
-# define _GL_ATTRIBUTE_PURE /* empty */
+#define _GL_ATTRIBUTE_PURE /* empty */
 #endif
 
 /* The __const__ attribute was added in gcc 2.95.  */
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
-# define _GL_ATTRIBUTE_CONST __attribute__ ((__const__))
+#define _GL_ATTRIBUTE_CONST __attribute__((__const__))
 #else
-# define _GL_ATTRIBUTE_CONST /* empty */
+#define _GL_ATTRIBUTE_CONST /* empty */
 #endif
-

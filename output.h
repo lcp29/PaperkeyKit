@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #ifndef _OUTPUT_H_
@@ -21,19 +21,19 @@
 
 #include <sys/types.h>
 
-enum data_type {AUTO,BASE16,RAW};
+enum data_type { AUTO, BASE16, RAW };
 
 #define CRC24_INIT 0xB704CEL
 
-void do_crc24(unsigned long *crc,const unsigned char *buf,size_t len);
-void print_bytes(FILE *stream,const unsigned char *buf,size_t length);
-void output_file_format(FILE *stream,const char *prefix);
-int output_start(const char *name,enum data_type type,
-		 unsigned char fingerprint[20]);
-ssize_t output_bytes(const unsigned char *buf,size_t length);
-#define output_packet(_packet) output_bytes((_packet)->buf,(_packet)->len)
+void do_crc24(unsigned long *crc, const unsigned char *buf, size_t len);
+void print_bytes(FILE *stream, const unsigned char *buf, size_t length);
+void output_file_format(FILE *stream, const char *prefix);
+int output_start(const char *name, enum data_type type,
+                 unsigned char fingerprint[20]);
+ssize_t output_bytes(const unsigned char *buf, size_t length);
+#define output_packet(_packet) output_bytes((_packet)->buf, (_packet)->len)
 ssize_t output_length16(size_t length);
-ssize_t output_openpgp_header(unsigned char tag,size_t length);
+ssize_t output_openpgp_header(unsigned char tag, size_t length);
 void output_finish(void);
 void set_binary_mode(FILE *stream);
 

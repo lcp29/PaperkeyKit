@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #ifndef _PACKETS_H_
@@ -21,8 +21,7 @@
 
 #include <sys/types.h>
 
-struct packet
-{
+struct packet {
   unsigned char type;
   unsigned char *buf;
   /* The length the data we've put into buf. */
@@ -31,10 +30,10 @@ struct packet
   size_t size;
 };
 
-void *xrealloc(void *ptr,size_t size);
-#define xmalloc(_size) xrealloc(NULL,_size)
-struct packet *append_packet(struct packet *packet,
-			     unsigned char *buf,size_t len);
+void *xrealloc(void *ptr, size_t size);
+#define xmalloc(_size) xrealloc(NULL, _size)
+struct packet *append_packet(struct packet *packet, unsigned char *buf,
+                             size_t len);
 void free_packet(struct packet *packet);
 
 #endif /* !_PACKETS_H_ */

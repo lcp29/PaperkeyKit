@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #include <config.h>
@@ -25,80 +25,73 @@
 
 extern int verbose;
 
-int
-extract(FILE *input,const char *outname,enum data_type output_type)
-{
+int extract(FILE *input, const char *outname, enum data_type output_type) {
   struct packet *packet;
   int offset;
   unsigned char fingerprint[20];
-  unsigned char version=0;
+  unsigned char version = 0;
 
-  packet=parse(input,5,0);
-  if(!packet)
-    {
-      fprintf(stderr,"Unable to find secret key packet\n");
-      return 1;
-    }
+  packet = parse(input, 5, 0);
+  if (!packet) {
+    fprintf(stderr, "Unable to find secret key packet\n");
+    return 1;
+  }
 
-  offset=extract_secrets(packet);
-  if(offset==-1)
+  offset = extract_secrets(packet);
+  if (offset == -1)
     return 1;
 
-  if(verbose>1)
-    fprintf(stderr,"Secret offset is %d\n",offset);
+  if (verbose > 1)
+    fprintf(stderr, "Secret offset is %d\n", offset);
 
-  calculate_fingerprint(packet,offset,fingerprint);
+  calculate_fingerprint(packet, offset, fingerprint);
 
-  if(verbose)
-    {
-      fprintf(stderr,"Primary key fingerprint: ");
-      print_bytes(stderr,fingerprint,20);
-      fprintf(stderr,"\n");
-    }
+  if (verbose) {
+    fprintf(stderr, "Primary key fingerprint: ");
+    print_bytes(stderr, fingerprint, 20);
+    fprintf(stderr, "\n");
+  }
 
-  output_start(outname,output_type,fingerprint);
-  output_bytes(&version,1);
-  output_bytes(packet->buf,1);
-  output_bytes(fingerprint,20);
-  output_length16(packet->len-offset);
-  output_bytes(&packet->buf[offset],packet->len-offset);
+  output_start(outname, output_type, fingerprint);
+  output_bytes(&version, 1);
+  output_bytes(packet->buf, 1);
+  output_bytes(fingerprint, 20);
+  output_length16(packet->len - offset);
+  output_bytes(&packet->buf[offset], packet->len - offset);
 
   free_packet(packet);
 
-  while((packet=parse(input,7,5)))
-    {
-      offset=extract_secrets(packet);
-      if(offset==-1)
-      	return 1;
+  while ((packet = parse(input, 7, 5))) {
+    offset = extract_secrets(packet);
+    if (offset == -1)
+      return 1;
 
-      if(verbose>1)
-	fprintf(stderr,"Secret subkey offset is %d\n",offset);
+    if (verbose > 1)
+      fprintf(stderr, "Secret subkey offset is %d\n", offset);
 
-      calculate_fingerprint(packet,offset,fingerprint);
+    calculate_fingerprint(packet, offset, fingerprint);
 
-      if(verbose)
-	{
-	  fprintf(stderr,"Subkey fingerprint: ");
-	  print_bytes(stderr,fingerprint,20);
-	  fprintf(stderr,"\n");
-	}
-
-      output_bytes(packet->buf,1);
-      output_bytes(fingerprint,20);
-      output_length16(packet->len-offset);
-      output_bytes(&packet->buf[offset],packet->len-offset);
-
-      free_packet(packet);
+    if (verbose) {
+      fprintf(stderr, "Subkey fingerprint: ");
+      print_bytes(stderr, fingerprint, 20);
+      fprintf(stderr, "\n");
     }
+
+    output_bytes(packet->buf, 1);
+    output_bytes(fingerprint, 20);
+    output_length16(packet->len - offset);
+    output_bytes(&packet->buf[offset], packet->len - offset);
+
+    free_packet(packet);
+  }
 
   output_finish();
 
-  if(input==stdin)
-    {
-      /* Consume everything else on input */
-      while((fgetc(input)!=EOF))
-	;
-    }
+  if (input == stdin) {
+    /* Consume everything else on input */
+    while ((fgetc(input) != EOF))
+      ;
+  }
 
   return 0;
 }

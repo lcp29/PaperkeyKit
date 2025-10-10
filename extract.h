@@ -13,12 +13,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #ifndef _EXTRACT_H_
 #define _EXTRACT_H_
 
-int extract(FILE *input,const char *outname,enum data_type output_type);
+int extract(FILE *input, const char *outname, enum data_type output_type);
 
 #endif /* !_EXTRACT_H_ */

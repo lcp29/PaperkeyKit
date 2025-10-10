@@ -13,14 +13,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
 #ifndef _RESTORE_H_
 #define _RESTORE_H_
 
-int restore(FILE *pubring,FILE *secrets,
-	    enum data_type input_type,const char *outname);
+int restore(FILE *pubring, FILE *secrets, enum data_type input_type,
+            const char *outname);
 
 #endif /* !_RESTORE_H_ */
-
