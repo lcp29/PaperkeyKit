@@ -23,6 +23,6 @@
 #include "stream.h"
 
 int restore(struct stream *pubring, struct stream *secrets,
-            enum data_type input_type, const char *outname);
+            enum data_type input_type, struct stream *output);
 
 #endif /* !_RESTORE_H_ */

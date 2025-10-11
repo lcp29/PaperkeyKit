@@ -25,7 +25,7 @@
 
 extern int verbose;
 
-int extract(struct stream *input, const char *outname,
+int extract(struct stream *input, struct stream *output,
             enum data_type output_type) {
   struct packet *packet;
   int offset;
@@ -34,7 +34,7 @@ int extract(struct stream *input, const char *outname,
 
   packet = parse(input, 5, 0);
   if (!packet) {
-    fprintf(stderr, "Unable to find secret key packet\n");
+    // fprintf(stderr, "Unable to find secret key packet\n");
     return 1;
   }
 
@@ -42,23 +42,23 @@ int extract(struct stream *input, const char *outname,
   if (offset == -1)
     return 1;
 
-  if (verbose > 1)
-    fprintf(stderr, "Secret offset is %d\n", offset);
+  // if (verbose > 1)
+  //   fprintf(stderr, "Secret offset is %d\n", offset);
 
   calculate_fingerprint(packet, offset, fingerprint);
 
-  if (verbose) {
-    fprintf(stderr, "Primary key fingerprint: ");
-    print_bytes(stderr, fingerprint, 20);
-    fprintf(stderr, "\n");
-  }
+  // if (verbose) {
+  //   fprintf(stderr, "Primary key fingerprint: ");
+  //   print_bytes(stderr, fingerprint, 20);
+  //   fprintf(stderr, "\n");
+  // }
 
-  output_start(outname, output_type, fingerprint);
-  output_bytes(&version, 1);
-  output_bytes(packet->buf, 1);
-  output_bytes(fingerprint, 20);
-  output_length16(packet->len - offset);
-  output_bytes(&packet->buf[offset], packet->len - offset);
+  output_start(output, output_type, fingerprint);
+  output_bytes(output, output_type, &version, 1);
+  output_bytes(output, output_type, packet->buf, 1);
+  output_bytes(output, output_type, fingerprint, 20);
+  output_length16(output, output_type, packet->len - offset);
+  output_bytes(output, output_type, &packet->buf[offset], packet->len - offset);
 
   free_packet(packet);
 
@@ -67,26 +67,26 @@ int extract(struct stream *input, const char *outname,
     if (offset == -1)
       return 1;
 
-    if (verbose > 1)
-      fprintf(stderr, "Secret subkey offset is %d\n", offset);
+    // if (verbose > 1)
+    //   fprintf(stderr, "Secret subkey offset is %d\n", offset);
 
     calculate_fingerprint(packet, offset, fingerprint);
 
-    if (verbose) {
-      fprintf(stderr, "Subkey fingerprint: ");
-      print_bytes(stderr, fingerprint, 20);
-      fprintf(stderr, "\n");
-    }
+    // if (verbose) {
+    //   fprintf(stderr, "Subkey fingerprint: ");
+    //   print_bytes(stderr, fingerprint, 20);
+    //   fprintf(stderr, "\n");
+    // }
 
-    output_bytes(packet->buf, 1);
-    output_bytes(fingerprint, 20);
-    output_length16(packet->len - offset);
-    output_bytes(&packet->buf[offset], packet->len - offset);
+    output_bytes(output, output_type, packet->buf, 1);
+    output_bytes(output, output_type, fingerprint, 20);
+    output_length16(output, output_type, packet->len - offset);
+    output_bytes(output, output_type, &packet->buf[offset], packet->len - offset);
 
     free_packet(packet);
   }
 
-  output_finish();
+  output_finish(output, output_type);
 
   return 0;
 }

@@ -45,7 +45,6 @@ enum options {
   OPT_PUBRING,
   OPT_SECRETS,
   OPT_IGNORE_CRC_ERROR,
-  OPT_FILE_FORMAT,
   OPT_COMMENT
 };
 
@@ -61,7 +60,6 @@ static struct option long_options[] = {
     {"pubring", required_argument, NULL, OPT_PUBRING},
     {"secrets", required_argument, NULL, OPT_SECRETS},
     {"ignore-crc-error", no_argument, NULL, OPT_IGNORE_CRC_ERROR},
-    {"file-format", no_argument, NULL, OPT_FILE_FORMAT},
     {"comment", required_argument, NULL, OPT_COMMENT},
     {NULL, 0, NULL, 0}};
 
@@ -182,19 +180,27 @@ int main(int argc, char *argv[]) {
       ignore_crc_error = 1;
       break;
 
-    case OPT_FILE_FORMAT:
-      output_file_format(stdout, "");
-      exit(0);
-
     case OPT_COMMENT:
       comment = optarg;
       break;
     }
 
-  if (pubring)
-    err = restore(pubring, secrets, input_type, outname);
-  else
-    err = extract(secret_key, outname, output_type);
-
+  if (pubring) {
+    struct stream *output = create_empty_stream();
+    err = restore(pubring, secrets, input_type, output);
+    FILE *outfile = fopen(outname, "wb");
+    fwrite(output->buffer, 1, output->size, outfile);
+    fclose(outfile);
+    free(output->buffer);
+    free(output);
+  } else {
+    struct stream *output = create_empty_stream();
+    err = extract(secret_key, output, output_type);
+    FILE *outfile = fopen(outname, "wb");
+    fwrite(output->buffer, 1, output->size, outfile);
+    fclose(outfile);
+    free(output->buffer);
+    free(output);
+  }
   return err;
 }

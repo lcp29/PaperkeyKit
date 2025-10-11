@@ -21,21 +21,22 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+#include "stream.h"
 
 enum data_type { AUTO, BASE16, RAW };
 
 #define CRC24_INIT 0xB704CEL
 
 void do_crc24(unsigned long *crc, const unsigned char *buf, size_t len);
-void print_bytes(FILE *stream, const unsigned char *buf, size_t length);
-void output_file_format(FILE *stream, const char *prefix);
-int output_start(const char *name, enum data_type type,
+void print_bytes(struct stream *stream, const unsigned char *buf, size_t length);
+void output_file_format(struct stream *stream, const char *prefix);
+int output_start(struct stream *output, enum data_type type,
                  unsigned char fingerprint[20]);
-ssize_t output_bytes(const unsigned char *buf, size_t length);
-#define output_packet(_packet) output_bytes((_packet)->buf, (_packet)->len)
-ssize_t output_length16(size_t length);
-ssize_t output_openpgp_header(unsigned char tag, size_t length);
-void output_finish(void);
+ssize_t output_bytes(struct stream *output, enum data_type type, const unsigned char *buf, size_t length);
+#define output_packet(output, type, _packet) output_bytes((output), (type),(_packet)->buf, (_packet)->len)
+ssize_t output_length16(struct stream *output, enum data_type type, size_t length);
+ssize_t output_openpgp_header(struct stream *output, enum data_type type, unsigned char tag, size_t length);
+void output_finish(struct stream *output, enum data_type type);
 void set_binary_mode(FILE *stream);
 
 #endif /* !_OUTPUT_H_ */

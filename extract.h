@@ -22,7 +22,7 @@
 #include "output.h"
 #include "stream.h"
 
-int extract(struct stream *input, const char *outname,
+int extract(struct stream *input, struct stream *output,
             enum data_type output_type);
 
 #endif /* !_EXTRACT_H_ */

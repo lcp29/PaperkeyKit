@@ -3,6 +3,7 @@
  */
 
 #include "stream.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -61,6 +62,49 @@ struct stream *create_stream(FILE *file) {
   fseek(file, 0, SEEK_SET);
   s->pos = 0;
   s->buffer = malloc(s->size);
+  s->memsize = s->size;
   fread(s->buffer, 1, s->size, file);
+  return s;
+}
+
+int stream_printf(struct stream *stream, const char *format, ...) {
+  va_list args;
+  char buffer[1024];
+  va_start(args, format);
+  int len = vsnprintf(buffer, sizeof(buffer), format, args);
+  va_end(args);
+  if (len < 0 || len >= (int)sizeof(buffer))
+    return -1;
+  if (stream->pos + len >= stream->memsize) {
+    stream->buffer = realloc(stream->buffer, 2 * (stream->pos + len));
+    stream->memsize = 2 * (stream->pos + len);
+  }
+  if (stream->pos + len > stream->size)
+    stream->size = stream->pos + len;
+  memcpy(stream->buffer + stream->pos, buffer, len);
+  stream->pos += len;
+  return len;
+}
+
+size_t stream_write(const void *ptr, size_t size, size_t nmemb, struct stream *stream) {
+  int total = size * nmemb;
+  if (stream->pos + total >= stream->memsize) {
+    stream->buffer = realloc(stream->buffer, 2 * (stream->pos + total));
+    stream->memsize = 2 * (stream->pos + total);
+  }
+  if (stream->pos + total > stream->size)
+    stream->size = stream->pos + total;
+  memcpy(stream->buffer + stream->pos, ptr, total);
+  stream->pos += total;
+  return nmemb;
+}
+
+struct stream *create_empty_stream(void)
+{
+  struct stream *s = malloc(sizeof(struct stream));
+  s->pos = 0;
+  s->size = 0;
+  s->buffer = malloc(1);
+  s->memsize = 1;
   return s;
 }

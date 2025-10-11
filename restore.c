@@ -39,7 +39,7 @@ static struct key *extract_keys(struct packet *packet) {
 
   /* Check the version */
   if (packet->len && packet->buf[0] != 0) {
-    fprintf(stderr, "Cannot handle secrets file version %d\n", packet->buf[0]);
+    // fprintf(stderr, "Cannot handle secrets file version %d\n", packet->buf[0]);
     return NULL;
   }
 
@@ -65,7 +65,7 @@ static struct key *extract_keys(struct packet *packet) {
           newkey->packet = append_packet(NULL, &packet->buf[idx], len);
           idx += len;
         } else {
-          fprintf(stderr, "Warning: Short data in secret image\n");
+          // fprintf(stderr, "Warning: Short data in secret image\n");
           free(newkey);
           break;
         }
@@ -73,11 +73,11 @@ static struct key *extract_keys(struct packet *packet) {
         newkey->next = key;
         key = newkey;
       } else {
-        fprintf(stderr, "Warning: Corrupt data in secret image\n");
+        // fprintf(stderr, "Warning: Corrupt data in secret image\n");
         break;
       }
     } else {
-      fprintf(stderr, "Warning: Short header in secret image\n");
+      // fprintf(stderr, "Warning: Short header in secret image\n");
       break;
     }
   }
@@ -95,14 +95,14 @@ static void free_keys(struct key *key) {
 }
 
 int restore(struct stream *pubring, struct stream *secrets,
-            enum data_type input_type, const char *outname) {
+            enum data_type input_type, struct stream *output) {
   struct packet *secret;
 
   if (input_type == AUTO) {
     int test = stream_getc(secrets);
 
     if (test == EOF) {
-      fprintf(stderr, "Unable to check type of secrets file\n");
+      // fprintf(stderr, "Unable to check type of secrets file\n");
       return 1;
     } else if (isascii(test) && isprint(test))
       input_type = BASE16;
@@ -125,7 +125,7 @@ int restore(struct stream *pubring, struct stream *secrets,
 
     keys = extract_keys(secret);
     if (keys) {
-      output_start(outname, RAW, NULL);
+      output_start(output, RAW, NULL);
 
       while ((pubkey = parse(pubring, 0, 0))) {
         unsigned char ptag;
@@ -150,16 +150,16 @@ int restore(struct stream *pubring, struct stream *secrets,
                 ptag = 7;
 
               /* Match, so create a secret key. */
-              output_openpgp_header(ptag, pubkey->len + keyidx->packet->len);
-              output_packet(pubkey);
-              output_packet(keyidx->packet);
+              output_openpgp_header(output, RAW, ptag, pubkey->len + keyidx->packet->len);
+              output_packet(output, RAW, pubkey);
+              output_packet(output, RAW, keyidx->packet);
             }
           }
         } else if (did_pubkey) {
           /* Copy the usual user ID, sigs, etc, so the key is
              well-formed. */
-          output_openpgp_header(pubkey->type, pubkey->len);
-          output_packet(pubkey);
+          output_openpgp_header(output, RAW, pubkey->type, pubkey->len);
+          output_packet(output, RAW, pubkey);
         }
 
         free_packet(pubkey);
@@ -167,11 +167,11 @@ int restore(struct stream *pubring, struct stream *secrets,
 
       free_keys(keys);
     } else {
-      fprintf(stderr, "Unable to parse secret data\n");
+      // fprintf(stderr, "Unable to parse secret data\n");
       return 1;
     }
   } else {
-    fprintf(stderr, "Unable to read secrets file\n");
+    // fprintf(stderr, "Unable to read secrets file\n");
     return 1;
   }
 
