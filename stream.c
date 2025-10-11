@@ -1,5 +1,5 @@
 /*
- * Created by helmholtz on 10/10/2025
+ * Copyright (C) 2025 helmholtz <helmholtz@fomal.host>
  */
 
 #include "stream.h"

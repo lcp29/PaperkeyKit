@@ -16,6 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
+/*
+ * Copyright (C) 2025 helmholtz <helmholtz@fomal.host>
+ */
+
 #ifndef _EXTRACT_H_
 #define _EXTRACT_H_
 
