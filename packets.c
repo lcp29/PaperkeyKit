@@ -25,8 +25,6 @@
 #include "packets.h"
 #include <string.h>
 
-extern int verbose;
-
 void *xrealloc(void *ptr, size_t size) {
   ptr = realloc(ptr, size);
   if (!ptr) {

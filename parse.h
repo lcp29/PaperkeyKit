@@ -32,6 +32,7 @@ int calculate_fingerprint(struct packet *packet, size_t public_len,
                           unsigned char fingerprint[20]);
 ssize_t extract_secrets(struct packet *packet);
 struct packet *read_secrets_file(struct stream *secrets,
-                                 enum data_type input_type);
+                                 enum data_type input_type,
+                                 int ignore_crc_error);
 
 #endif /* !_PARSE_H_ */

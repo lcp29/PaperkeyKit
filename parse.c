@@ -30,9 +30,6 @@
 #include "stream.h"
 #include "parse.h"
 
-extern int verbose;
-extern int ignore_crc_error;
-
 struct packet *parse(struct stream *input, unsigned char want,
                      unsigned char stop) {
   int byte;
@@ -300,7 +297,8 @@ ssize_t extract_secrets(struct packet *packet) {
 }
 
 struct packet *read_secrets_file(struct stream *secrets,
-                                 enum data_type input_type) {
+                                 enum data_type input_type,
+                                 int ignore_crc_error) {
   struct packet *packet = NULL;
   int final_crc = 0;
   unsigned long my_crc = 0;

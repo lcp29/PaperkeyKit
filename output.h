@@ -35,12 +35,13 @@ void do_crc24(unsigned long *crc, const unsigned char *buf, size_t len);
 void print_bytes(struct stream *stream, const unsigned char *buf, size_t length);
 void output_file_format(struct stream *stream, const char *prefix);
 int output_start(struct stream *output, enum data_type type,
-                 unsigned char fingerprint[20]);
-ssize_t output_bytes(struct stream *output, enum data_type type, const unsigned char *buf, size_t length);
-#define output_packet(output, type, _packet) output_bytes((output), (type),(_packet)->buf, (_packet)->len)
-ssize_t output_length16(struct stream *output, enum data_type type, size_t length);
-ssize_t output_openpgp_header(struct stream *output, enum data_type type, unsigned char tag, size_t length);
-void output_finish(struct stream *output, enum data_type type);
+                 unsigned char fingerprint[20], unsigned int output_width,
+                 unsigned int *line_items);
+ssize_t output_bytes(struct stream *output, enum data_type type, const unsigned char *buf, size_t length, unsigned int line_items, unsigned long *all_crc);
+#define output_packet(output, type, _packet, line_items, all_crc) output_bytes((output), (type),(_packet)->buf, (_packet)->len, (line_items), (all_crc))
+ssize_t output_length16(struct stream *output, enum data_type type, size_t length, unsigned int line_items, unsigned long *all_crc);
+ssize_t output_openpgp_header(struct stream *output, enum data_type type, unsigned char tag, size_t length, unsigned int line_items, unsigned long *all_crc);
+void output_finish(struct stream *output, enum data_type type, unsigned int line_items, unsigned long *all_crc);
 // void set_binary_mode(FILE *stream);
 
 #endif /* !_OUTPUT_H_ */

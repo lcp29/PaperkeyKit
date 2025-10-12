@@ -27,14 +27,14 @@
 #include "parse.h"
 #include "extract.h"
 
-extern int verbose;
-
 int extract(struct stream *input, struct stream *output,
-            enum data_type output_type) {
+            enum data_type output_type, unsigned int output_width) {
   struct packet *packet;
   int offset;
   unsigned char fingerprint[20];
   unsigned char version = 0;
+  unsigned int line_items;
+  unsigned long all_crc = CRC24_INIT;
 
   packet = parse(input, 5, 0);
   if (!packet) {
@@ -57,12 +57,12 @@ int extract(struct stream *input, struct stream *output,
   //   fprintf(stderr, "\n");
   // }
 
-  output_start(output, output_type, fingerprint);
-  output_bytes(output, output_type, &version, 1);
-  output_bytes(output, output_type, packet->buf, 1);
-  output_bytes(output, output_type, fingerprint, 20);
-  output_length16(output, output_type, packet->len - offset);
-  output_bytes(output, output_type, &packet->buf[offset], packet->len - offset);
+  output_start(output, output_type, fingerprint, output_width, &line_items);
+  output_bytes(output, output_type, &version, 1, line_items, &all_crc);
+  output_bytes(output, output_type, packet->buf, 1, line_items, &all_crc);
+  output_bytes(output, output_type, fingerprint, 20, line_items, &all_crc);
+  output_length16(output, output_type, packet->len - offset, line_items, &all_crc);
+  output_bytes(output, output_type, &packet->buf[offset], packet->len - offset, line_items, &all_crc);
 
   free_packet(packet);
 
@@ -82,15 +82,15 @@ int extract(struct stream *input, struct stream *output,
     //   fprintf(stderr, "\n");
     // }
 
-    output_bytes(output, output_type, packet->buf, 1);
-    output_bytes(output, output_type, fingerprint, 20);
-    output_length16(output, output_type, packet->len - offset);
-    output_bytes(output, output_type, &packet->buf[offset], packet->len - offset);
+    output_bytes(output, output_type, packet->buf, 1, line_items, &all_crc);
+    output_bytes(output, output_type, fingerprint, 20, line_items, &all_crc);
+    output_length16(output, output_type, packet->len - offset, line_items, &all_crc);
+    output_bytes(output, output_type, &packet->buf[offset], packet->len - offset, line_items, &all_crc);
 
     free_packet(packet);
   }
 
-  output_finish(output, output_type);
+  output_finish(output, output_type, line_items, &all_crc);
 
   return 0;
 }

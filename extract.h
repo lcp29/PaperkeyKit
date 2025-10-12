@@ -27,6 +27,6 @@
 #include "stream.h"
 
 int extract(struct stream *input, struct stream *output,
-            enum data_type output_type);
+            enum data_type output_type, unsigned int output_width);
 
 #endif /* !_EXTRACT_H_ */

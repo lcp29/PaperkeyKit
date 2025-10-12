@@ -33,14 +33,9 @@
 #include "restore.h"
 #include "stream.h"
 
-int verbose = 0, ignore_crc_error = 0;
-unsigned int output_width = 78;
-char *comment = NULL;
-
 enum options {
   OPT_HELP = 256,
   OPT_VERSION,
-  OPT_VERBOSE,
   OPT_OUTPUT,
   OPT_INPUT_TYPE,
   OPT_OUTPUT_TYPE,
@@ -55,7 +50,6 @@ enum options {
 static struct option long_options[] = {
     {"help", no_argument, NULL, OPT_HELP},
     {"version", no_argument, NULL, OPT_VERSION},
-    {"verbose", no_argument, NULL, OPT_VERBOSE},
     {"output", required_argument, NULL, OPT_OUTPUT},
     {"input-type", required_argument, NULL, OPT_INPUT_TYPE},
     {"output-type", required_argument, NULL, OPT_OUTPUT_TYPE},
@@ -64,14 +58,12 @@ static struct option long_options[] = {
     {"pubring", required_argument, NULL, OPT_PUBRING},
     {"secrets", required_argument, NULL, OPT_SECRETS},
     {"ignore-crc-error", no_argument, NULL, OPT_IGNORE_CRC_ERROR},
-    {"comment", required_argument, NULL, OPT_COMMENT},
     {NULL, 0, NULL, 0}};
 
 static void usage(void) {
   printf("Usage: paperkey [OPTIONS]\n");
   printf("  --help (-h)\n");
   printf("  --version (-V)\n");
-  printf("  --verbose (-v)  be more verbose\n");
   printf("  --output (-o)   write output to this file\n");
   printf("  --input-type    auto, base16 or raw (binary)\n");
   printf("  --output-type   base16 or raw (binary)\n");
@@ -94,6 +86,8 @@ int main(int argc, char *argv[]) {
   const char *outname = NULL;
   enum data_type output_type = BASE16;
   enum data_type input_type = AUTO;
+  unsigned int output_width = 78;
+  int ignore_crc_error = 0;
 
   while ((arg = getopt_long(argc, argv, "hVvo:", long_options, NULL)) != -1)
     switch (arg) {
@@ -113,11 +107,6 @@ int main(int argc, char *argv[]) {
              " <http://www.gnu.org/licenses/gpl.html>.\n");
       printf("There is NO WARRANTY, to the extent permitted by law.\n\n");
       exit(0);
-
-    case OPT_VERBOSE:
-    case 'v':
-      verbose++;
-      break;
 
     case OPT_OUTPUT:
     case 'o':
@@ -183,15 +172,11 @@ int main(int argc, char *argv[]) {
     case OPT_IGNORE_CRC_ERROR:
       ignore_crc_error = 1;
       break;
-
-    case OPT_COMMENT:
-      comment = optarg;
-      break;
     }
 
   if (pubring) {
     struct stream *output = create_empty_stream();
-    err = restore(pubring, secrets, input_type, output);
+    err = restore(pubring, secrets, input_type, output, output_width, ignore_crc_error);
     FILE *outfile = fopen(outname, "wb");
     fwrite(output->buffer, 1, output->size, outfile);
     fclose(outfile);
@@ -199,7 +184,7 @@ int main(int argc, char *argv[]) {
     free(output);
   } else {
     struct stream *output = create_empty_stream();
-    err = extract(secret_key, output, output_type);
+    err = extract(secret_key, output, output_type, output_width);
     FILE *outfile = fopen(outname, "wb");
     fwrite(output->buffer, 1, output->size, outfile);
     fclose(outfile);

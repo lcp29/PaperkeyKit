@@ -43,7 +43,8 @@ static struct key *extract_keys(struct packet *packet) {
 
   /* Check the version */
   if (packet->len && packet->buf[0] != 0) {
-    // fprintf(stderr, "Cannot handle secrets file version %d\n", packet->buf[0]);
+    // fprintf(stderr, "Cannot handle secrets file version %d\n",
+    // packet->buf[0]);
     return NULL;
   }
 
@@ -99,8 +100,11 @@ static void free_keys(struct key *key) {
 }
 
 int restore(struct stream *pubring, struct stream *secrets,
-            enum data_type input_type, struct stream *output) {
+            enum data_type input_type, struct stream *output,
+            unsigned int output_width, int ignore_crc_error) {
   struct packet *secret;
+  unsigned int line_items;
+  unsigned long all_crc = CRC24_INIT;
 
   if (input_type == AUTO) {
     int test = stream_getc(secrets);
@@ -116,7 +120,7 @@ int restore(struct stream *pubring, struct stream *secrets,
     secrets->pos--;
   }
 
-  secret = read_secrets_file(secrets, input_type);
+  secret = read_secrets_file(secrets, input_type, ignore_crc_error);
   if (secret) {
     struct packet *pubkey;
     struct key *keys;
@@ -129,7 +133,7 @@ int restore(struct stream *pubring, struct stream *secrets,
 
     keys = extract_keys(secret);
     if (keys) {
-      output_start(output, RAW, NULL);
+      output_start(output, RAW, NULL, output_width, &line_items);
 
       while ((pubkey = parse(pubring, 0, 0))) {
         unsigned char ptag;
@@ -154,16 +158,17 @@ int restore(struct stream *pubring, struct stream *secrets,
                 ptag = 7;
 
               /* Match, so create a secret key. */
-              output_openpgp_header(output, RAW, ptag, pubkey->len + keyidx->packet->len);
-              output_packet(output, RAW, pubkey);
-              output_packet(output, RAW, keyidx->packet);
+              output_openpgp_header(output, RAW, ptag,
+                                    pubkey->len + keyidx->packet->len, line_items, &all_crc);
+              output_packet(output, RAW, pubkey, line_items, &all_crc);
+              output_packet(output, RAW, keyidx->packet, line_items, &all_crc);
             }
           }
         } else if (did_pubkey) {
           /* Copy the usual user ID, sigs, etc, so the key is
              well-formed. */
-          output_openpgp_header(output, RAW, pubkey->type, pubkey->len);
-          output_packet(output, RAW, pubkey);
+          output_openpgp_header(output, RAW, pubkey->type, pubkey->len, line_items, &all_crc);
+          output_packet(output, RAW, pubkey, line_items, &all_crc);
         }
 
         free_packet(pubkey);
