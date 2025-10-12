@@ -20,36 +20,6 @@ include_directories(.)
 # gl/ directory for gnulib headers
 include_directories(gl)
 
-# # Check for getopt functions
-# include(CheckFunctionExists)
-# check_function_exists(getopt HAVE_GETOPT)
-# check_function_exists(getopt_long HAVE_GETOPT_LONG)
-# check_function_exists(getopt_long_only HAVE_GETOPT_LONG_ONLY)
-
-# # List of source files for the paperkey executable
-# set(SOURCES
-#     paperkey.c
-#     extract.c
-#     restore.c
-#     parse.c
-#     packets.c
-#     output.c
-#     stream.c
-#     gl/sha1.c
-#     gl/unistd.c
-# )
-
-# # Conditionally add getopt sources if not available on system
-# if(NOT HAVE_GETOPT_LONG)
-#     list(APPEND SOURCES gl/getopt.c)
-# endif()
-# if(NOT HAVE_GETOPT_LONG_ONLY)
-#     list(APPEND SOURCES gl/getopt1.c)
-# endif()
-
-# # Create the paperkey executable from the source files
-# add_executable(paperkey ${SOURCES})
-
 # List of source files for the paperkeytest executable
 set(TEST_SOURCES
     paperkeytest.c
@@ -60,7 +30,7 @@ set(TEST_SOURCES
     output.c
     stream.c
     gl/sha1.c
-    gl/unistd.c
+    # gl/unistd.c
 )
 
 # Create the paperkeytest executable from the test source files
