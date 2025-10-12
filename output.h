@@ -41,6 +41,6 @@ ssize_t output_bytes(struct stream *output, enum data_type type, const unsigned 
 ssize_t output_length16(struct stream *output, enum data_type type, size_t length);
 ssize_t output_openpgp_header(struct stream *output, enum data_type type, unsigned char tag, size_t length);
 void output_finish(struct stream *output, enum data_type type);
-void set_binary_mode(FILE *stream);
+// void set_binary_mode(FILE *stream);
 
 #endif /* !_OUTPUT_H_ */

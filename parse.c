@@ -210,7 +210,7 @@ ssize_t extract_secrets(struct packet *packet) {
      public stuff. */
 
   if (packet->buf[0] == 3) {
-    fprintf(stderr, "Version 3 (PGP 2.x style) keys are not supported.\n");
+    // fprintf(stderr, "Version 3 (PGP 2.x style) keys are not supported.\n");
     return -1;
   } else if (packet->buf[0] == 4) {
     /* Jump 5 bytes in.  That gets us past 1 byte of version, and 4
@@ -292,7 +292,7 @@ ssize_t extract_secrets(struct packet *packet) {
 
   default:
     /* What algorithm? */
-    fprintf(stderr, "Unable to parse algorithm %u\n", packet->buf[offset - 1]);
+    // fprintf(stderr, "Unable to parse algorithm %u\n", packet->buf[offset - 1]);
     return -1;
   }
 

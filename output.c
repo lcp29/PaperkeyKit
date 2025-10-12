@@ -299,14 +299,14 @@ ssize_t output_openpgp_header(struct stream *output, enum data_type type, unsign
 
 void output_finish(struct stream *output, enum data_type type) { output_bytes(output, type, NULL, 0); }
 
-void set_binary_mode(FILE *stream) {
-#ifdef _WIN32
-  if (_setmode(_fileno(stream), _O_BINARY) == -1) {
-    fprintf(stderr, "Unable to set stream mode to binary: %s\n",
-            strerror(errno));
-    exit(1);
-  }
-#else
-  (void)stream;
-#endif
-}
+// void set_binary_mode(FILE *stream) {
+// #ifdef _WIN32
+//   if (_setmode(_fileno(stream), _O_BINARY) == -1) {
+//     fprintf(stderr, "Unable to set stream mode to binary: %s\n",
+//             strerror(errno));
+//     exit(1);
+//   }
+// #else
+//   (void)stream;
+// #endif
+// }
