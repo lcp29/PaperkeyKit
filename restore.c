@@ -105,6 +105,9 @@ int restore(struct stream *pubring, struct stream *secrets,
   struct packet *secret;
   unsigned int line_items;
   unsigned long all_crc = CRC24_INIT;
+  unsigned int line = 0;
+  unsigned long line_crc = CRC24_INIT;
+  unsigned int b16_offset = 0;
 
   if (input_type == AUTO) {
     int test = stream_getc(secrets);
@@ -159,16 +162,16 @@ int restore(struct stream *pubring, struct stream *secrets,
 
               /* Match, so create a secret key. */
               output_openpgp_header(output, RAW, ptag,
-                                    pubkey->len + keyidx->packet->len, line_items, &all_crc);
-              output_packet(output, RAW, pubkey, line_items, &all_crc);
-              output_packet(output, RAW, keyidx->packet, line_items, &all_crc);
+                                    pubkey->len + keyidx->packet->len, line_items, &all_crc, &line, &line_crc, &b16_offset);
+              output_packet(output, RAW, pubkey, line_items, &all_crc, &line, &line_crc, &b16_offset);
+              output_packet(output, RAW, keyidx->packet, line_items, &all_crc, &line, &line_crc, &b16_offset);
             }
           }
         } else if (did_pubkey) {
           /* Copy the usual user ID, sigs, etc, so the key is
              well-formed. */
-          output_openpgp_header(output, RAW, pubkey->type, pubkey->len, line_items, &all_crc);
-          output_packet(output, RAW, pubkey, line_items, &all_crc);
+          output_openpgp_header(output, RAW, pubkey->type, pubkey->len, line_items, &all_crc, &line, &line_crc, &b16_offset);
+          output_packet(output, RAW, pubkey, line_items, &all_crc, &line, &line_crc, &b16_offset);
         }
 
         free_packet(pubkey);

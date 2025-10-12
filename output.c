@@ -47,31 +47,32 @@ void do_crc24(unsigned long *crc, const unsigned char *buf, size_t len) {
 }
 
 static void print_base16(struct stream *output, const unsigned char *buf,
-                         size_t length, unsigned int line_items, unsigned long all_crc) {
-  static unsigned long line_crc = CRC24_INIT;
-  static unsigned int line = 0;
+                         size_t length, unsigned int line_items,
+                         unsigned long all_crc, unsigned int *line,
+                         unsigned long *line_crc, unsigned int *offset) {
+  // static unsigned long line_crc = CRC24_INIT;
+  // static unsigned int line = 0;
 
   if (buf) {
     size_t i;
-    static unsigned int offset = 0;
 
-    for (i = 0; i < length; i++, offset++) {
-      if (offset % line_items == 0) {
-        if (line) {
-          stream_printf(output, "%06lX\n", line_crc & 0xFFFFFFL);
-          line_crc = CRC24_INIT;
+    for (i = 0; i < length; i++, (*offset)++) {
+      if (*offset % line_items == 0) {
+        if (*line) {
+          stream_printf(output, "%06lX\n", *line_crc & 0xFFFFFFL);
+          *line_crc = CRC24_INIT;
         }
 
-        stream_printf(output, "%3u: ", ++line);
+        stream_printf(output, "%3u: ", ++*line);
       }
 
       stream_printf(output, "%02X ", buf[i]);
 
-      do_crc24(&line_crc, &buf[i], 1);
+      do_crc24(line_crc, &buf[i], 1);
     }
   } else {
-    stream_printf(output, "%06lX\n", line_crc & 0xFFFFFFL);
-    stream_printf(output, "%3u: %06lX\n", line + 1, all_crc & 0xFFFFFFL);
+    stream_printf(output, "%06lX\n", *line_crc & 0xFFFFFFL);
+    stream_printf(output, "%3u: %06lX\n", *line + 1, all_crc & 0xFFFFFFL);
   }
 }
 
@@ -201,7 +202,8 @@ int output_start(struct stream *output, enum data_type type,
 
 ssize_t output_bytes(struct stream *output, enum data_type type,
                      const unsigned char *buf, size_t length,
-                     unsigned int line_items, unsigned long *all_crc) {
+                     unsigned int line_items, unsigned long *all_crc,
+                     unsigned int *line, unsigned long *line_crc, unsigned int *offset) {
   ssize_t ret = -1;
 
   do_crc24(all_crc, buf, length);
@@ -222,7 +224,7 @@ ssize_t output_bytes(struct stream *output, enum data_type type,
 
   case AUTO:
   case BASE16:
-    print_base16(output, buf, length, line_items, *all_crc);
+    print_base16(output, buf, length, line_items, *all_crc, line, line_crc, offset);
     ret = length;
     break;
   }
@@ -231,7 +233,9 @@ ssize_t output_bytes(struct stream *output, enum data_type type,
 }
 
 ssize_t output_length16(struct stream *output, enum data_type type,
-                        size_t length, unsigned int line_items, unsigned long *all_crc) {
+                        size_t length, unsigned int line_items,
+                        unsigned long *all_crc, unsigned int *line,
+                        unsigned long *line_crc, unsigned int *offset) {
   unsigned char encoded[2];
 
   assert(length <= 65535);
@@ -239,12 +243,14 @@ ssize_t output_length16(struct stream *output, enum data_type type,
   encoded[0] = length >> 8;
   encoded[1] = length;
 
-  return output_bytes(output, type, encoded, 2, line_items, all_crc);
+  return output_bytes(output, type, encoded, 2, line_items, all_crc, line,
+                      line_crc, offset);
 }
 
 ssize_t output_openpgp_header(struct stream *output, enum data_type type,
                               unsigned char tag, size_t length,
-                              unsigned int line_items, unsigned long *all_crc) {
+                              unsigned int line_items, unsigned long *all_crc,
+                              unsigned int *line, unsigned long *line_crc, unsigned int *offset) {
   unsigned char encoded[6];
   size_t bytes;
 
@@ -293,12 +299,14 @@ ssize_t output_openpgp_header(struct stream *output, enum data_type type,
     }
   }
 
-  return output_bytes(output, type, encoded, bytes, line_items, all_crc);
+  return output_bytes(output, type, encoded, bytes, line_items, all_crc, line,
+                      line_crc, offset);
 }
 
 void output_finish(struct stream *output, enum data_type type,
-                   unsigned int line_items, unsigned long *all_crc) {
-  output_bytes(output, type, NULL, 0, line_items, all_crc);
+                   unsigned int line_items, unsigned long *all_crc,
+                   unsigned int *line, unsigned long *line_crc, unsigned int *offset) {
+  output_bytes(output, type, NULL, 0, line_items, all_crc, line, line_crc, offset);
 }
 
 // void set_binary_mode(FILE *stream) {
