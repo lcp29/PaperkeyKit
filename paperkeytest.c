@@ -2,17 +2,17 @@
  * paperkeytest.c - Test file for paperkey roundtrip functionality
  */
 
-#include <config.h>
+#include "config.h"
+#include "extract.h"
+#include "output.h"
+#include "restore.h"
+#include "stream.h"
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include "output.h"
-#include "extract.h"
-#include "restore.h"
-#include "stream.h"
+#include <sys/types.h>
 
 int main(void) {
   const char *types[] = {"rsa", "dsaelg", "ecc", "eddsa"};

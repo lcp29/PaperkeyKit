@@ -20,16 +20,16 @@
  * Copyright (C) 2025 helmholtz <helmholtz@fomal.host>
  */
 
-#include <config.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <ctype.h>
-#include "packets.h"
-#include "output.h"
-#include "parse.h"
 #include "restore.h"
+#include "config.h"
+#include "output.h"
+#include "packets.h"
+#include "parse.h"
+#include <ctype.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct key {
   unsigned char fpr[20];
@@ -161,17 +161,23 @@ int restore(struct stream *pubring, struct stream *secrets,
                 ptag = 7;
 
               /* Match, so create a secret key. */
-              output_openpgp_header(output, RAW, ptag,
-                                    pubkey->len + keyidx->packet->len, line_items, &all_crc, &line, &line_crc, &b16_offset);
-              output_packet(output, RAW, pubkey, line_items, &all_crc, &line, &line_crc, &b16_offset);
-              output_packet(output, RAW, keyidx->packet, line_items, &all_crc, &line, &line_crc, &b16_offset);
+              output_openpgp_header(
+                  output, RAW, ptag, pubkey->len + keyidx->packet->len,
+                  line_items, &all_crc, &line, &line_crc, &b16_offset);
+              output_packet(output, RAW, pubkey, line_items, &all_crc, &line,
+                            &line_crc, &b16_offset);
+              output_packet(output, RAW, keyidx->packet, line_items, &all_crc,
+                            &line, &line_crc, &b16_offset);
             }
           }
         } else if (did_pubkey) {
           /* Copy the usual user ID, sigs, etc, so the key is
              well-formed. */
-          output_openpgp_header(output, RAW, pubkey->type, pubkey->len, line_items, &all_crc, &line, &line_crc, &b16_offset);
-          output_packet(output, RAW, pubkey, line_items, &all_crc, &line, &line_crc, &b16_offset);
+          output_openpgp_header(output, RAW, pubkey->type, pubkey->len,
+                                line_items, &all_crc, &line, &line_crc,
+                                &b16_offset);
+          output_packet(output, RAW, pubkey, line_items, &all_crc, &line,
+                        &line_crc, &b16_offset);
         }
 
         free_packet(pubkey);

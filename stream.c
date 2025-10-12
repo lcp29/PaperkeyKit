@@ -86,7 +86,8 @@ int stream_printf(struct stream *stream, const char *format, ...) {
   return len;
 }
 
-size_t stream_write(const void *ptr, size_t size, size_t nmemb, struct stream *stream) {
+size_t stream_write(const void *ptr, size_t size, size_t nmemb,
+                    struct stream *stream) {
   int total = size * nmemb;
   if (stream->pos + total >= stream->memsize) {
     stream->buffer = realloc(stream->buffer, 2 * (stream->pos + total));
@@ -99,8 +100,7 @@ size_t stream_write(const void *ptr, size_t size, size_t nmemb, struct stream *s
   return nmemb;
 }
 
-struct stream *create_empty_stream(void)
-{
+struct stream *create_empty_stream(void) {
   struct stream *s = malloc(sizeof(struct stream));
   s->pos = 0;
   s->size = 0;

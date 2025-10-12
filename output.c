@@ -20,14 +20,14 @@
  * Copyright (C) 2025 helmholtz <helmholtz@fomal.host>
  */
 
-#include <config.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <assert.h>
-#include "packets.h"
 #include "output.h"
+#include "config.h"
+#include "packets.h"
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 #define CRC24_POLY 0x864CFBL
 
@@ -203,7 +203,8 @@ int output_start(struct stream *output, enum data_type type,
 ssize_t output_bytes(struct stream *output, enum data_type type,
                      const unsigned char *buf, size_t length,
                      unsigned int line_items, unsigned long *all_crc,
-                     unsigned int *line, unsigned long *line_crc, unsigned int *offset) {
+                     unsigned int *line, unsigned long *line_crc,
+                     unsigned int *offset) {
   ssize_t ret = -1;
 
   do_crc24(all_crc, buf, length);
@@ -224,7 +225,8 @@ ssize_t output_bytes(struct stream *output, enum data_type type,
 
   case AUTO:
   case BASE16:
-    print_base16(output, buf, length, line_items, *all_crc, line, line_crc, offset);
+    print_base16(output, buf, length, line_items, *all_crc, line, line_crc,
+                 offset);
     ret = length;
     break;
   }
@@ -250,7 +252,8 @@ ssize_t output_length16(struct stream *output, enum data_type type,
 ssize_t output_openpgp_header(struct stream *output, enum data_type type,
                               unsigned char tag, size_t length,
                               unsigned int line_items, unsigned long *all_crc,
-                              unsigned int *line, unsigned long *line_crc, unsigned int *offset) {
+                              unsigned int *line, unsigned long *line_crc,
+                              unsigned int *offset) {
   unsigned char encoded[6];
   size_t bytes;
 
@@ -305,8 +308,10 @@ ssize_t output_openpgp_header(struct stream *output, enum data_type type,
 
 void output_finish(struct stream *output, enum data_type type,
                    unsigned int line_items, unsigned long *all_crc,
-                   unsigned int *line, unsigned long *line_crc, unsigned int *offset) {
-  output_bytes(output, type, NULL, 0, line_items, all_crc, line, line_crc, offset);
+                   unsigned int *line, unsigned long *line_crc,
+                   unsigned int *offset) {
+  output_bytes(output, type, NULL, 0, line_items, all_crc, line, line_crc,
+               offset);
 }
 
 // void set_binary_mode(FILE *stream) {

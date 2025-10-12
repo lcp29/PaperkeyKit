@@ -14,12 +14,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # Add compiler flags for warnings and pedantic mode (equivalent to original Makefile)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W -pedantic")
 
-# Include directories for headers
-# Current directory for config.h and other local headers
-include_directories(.)
-# gl/ directory for gnulib headers
-include_directories(gl)
-
 # List of source files for the paperkeytest executable
 set(TEST_SOURCES
     paperkeytest.c
@@ -29,8 +23,7 @@ set(TEST_SOURCES
     packets.c
     output.c
     stream.c
-    gl/sha1.c
-    # gl/unistd.c
+    sha1.c
 )
 
 # Create the paperkeytest executable from the test source files

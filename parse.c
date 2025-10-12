@@ -20,15 +20,15 @@
  * Copyright (C) 2025 helmholtz <helmholtz@fomal.host>
  */
 
-#include <config.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "sha1.h"
-#include "packets.h"
-#include "output.h"
-#include "stream.h"
 #include "parse.h"
+#include "config.h"
+#include "output.h"
+#include "packets.h"
+#include "sha1.h"
+#include "stream.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 struct packet *parse(struct stream *input, unsigned char want,
                      unsigned char stop) {
@@ -289,7 +289,8 @@ ssize_t extract_secrets(struct packet *packet) {
 
   default:
     /* What algorithm? */
-    // fprintf(stderr, "Unable to parse algorithm %u\n", packet->buf[offset - 1]);
+    // fprintf(stderr, "Unable to parse algorithm %u\n", packet->buf[offset -
+    // 1]);
     return -1;
   }
 

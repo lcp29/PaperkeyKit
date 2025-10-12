@@ -20,12 +20,12 @@
  * Copyright (C) 2025 helmholtz <helmholtz@fomal.host>
  */
 
-#include <config.h>
-#include <stdio.h>
-#include "packets.h"
-#include "output.h"
-#include "parse.h"
 #include "extract.h"
+#include "config.h"
+#include "output.h"
+#include "packets.h"
+#include "parse.h"
+#include <stdio.h>
 
 int extract(struct stream *input, struct stream *output,
             enum data_type output_type, unsigned int output_width) {
@@ -61,11 +61,16 @@ int extract(struct stream *input, struct stream *output,
   // }
 
   output_start(output, output_type, fingerprint, output_width, &line_items);
-  output_bytes(output, output_type, &version, 1, line_items, &all_crc, &line, &line_crc, &b16_offset);
-  output_bytes(output, output_type, packet->buf, 1, line_items, &all_crc, &line, &line_crc, &b16_offset);
-  output_bytes(output, output_type, fingerprint, 20, line_items, &all_crc, &line, &line_crc, &b16_offset);
-  output_length16(output, output_type, packet->len - offset, line_items, &all_crc, &line, &line_crc, &b16_offset);
-  output_bytes(output, output_type, &packet->buf[offset], packet->len - offset, line_items, &all_crc, &line, &line_crc, &b16_offset);
+  output_bytes(output, output_type, &version, 1, line_items, &all_crc, &line,
+               &line_crc, &b16_offset);
+  output_bytes(output, output_type, packet->buf, 1, line_items, &all_crc, &line,
+               &line_crc, &b16_offset);
+  output_bytes(output, output_type, fingerprint, 20, line_items, &all_crc,
+               &line, &line_crc, &b16_offset);
+  output_length16(output, output_type, packet->len - offset, line_items,
+                  &all_crc, &line, &line_crc, &b16_offset);
+  output_bytes(output, output_type, &packet->buf[offset], packet->len - offset,
+               line_items, &all_crc, &line, &line_crc, &b16_offset);
 
   free_packet(packet);
 
@@ -85,15 +90,21 @@ int extract(struct stream *input, struct stream *output,
     //   fprintf(stderr, "\n");
     // }
 
-    output_bytes(output, output_type, packet->buf, 1, line_items, &all_crc, &line, &line_crc, &b16_offset);
-    output_bytes(output, output_type, fingerprint, 20, line_items, &all_crc, &line, &line_crc, &b16_offset);
-    output_length16(output, output_type, packet->len - offset, line_items, &all_crc, &line, &line_crc, &b16_offset);
-    output_bytes(output, output_type, &packet->buf[offset], packet->len - offset, line_items, &all_crc, &line, &line_crc, &b16_offset);
+    output_bytes(output, output_type, packet->buf, 1, line_items, &all_crc,
+                 &line, &line_crc, &b16_offset);
+    output_bytes(output, output_type, fingerprint, 20, line_items, &all_crc,
+                 &line, &line_crc, &b16_offset);
+    output_length16(output, output_type, packet->len - offset, line_items,
+                    &all_crc, &line, &line_crc, &b16_offset);
+    output_bytes(output, output_type, &packet->buf[offset],
+                 packet->len - offset, line_items, &all_crc, &line, &line_crc,
+                 &b16_offset);
 
     free_packet(packet);
   }
 
-  output_finish(output, output_type, line_items, &all_crc, &line, &line_crc, &b16_offset);
+  output_finish(output, output_type, line_items, &all_crc, &line, &line_crc,
+                &b16_offset);
 
   return 0;
 }

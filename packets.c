@@ -16,13 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-#include <config.h>
+#include "packets.h"
+#include "config.h"
+#include "output.h"
+#include "sha1.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "sha1.h"
-#include "output.h"
-#include "packets.h"
 #include <string.h>
 
 void *xrealloc(void *ptr, size_t size) {
