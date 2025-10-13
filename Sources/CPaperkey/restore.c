@@ -101,7 +101,7 @@ static void free_keys(struct key *key) {
 
 int restore(struct stream *pubring, struct stream *secrets,
             enum data_type input_type, struct stream *output,
-            unsigned int output_width, int ignore_crc_error) {
+            int ignore_crc_error) {
   struct packet *secret;
   unsigned int line_items;
   unsigned long all_crc = CRC24_INIT;
@@ -136,7 +136,7 @@ int restore(struct stream *pubring, struct stream *secrets,
 
     keys = extract_keys(secret);
     if (keys) {
-      output_start(output, RAW, NULL, output_width, &line_items);
+      output_start(output, RAW, NULL, 0, &line_items);
 
       while ((pubkey = parse(pubring, 0, 0))) {
         unsigned char ptag;

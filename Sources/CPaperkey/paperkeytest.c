@@ -51,7 +51,7 @@ int main(void) {
     }
     extracted_raw->pos = 0;
     struct stream *restored_raw = create_empty_stream();
-    if (restore(pub_stream, extracted_raw, RAW, restored_raw, 78, 0) != 0) {
+    if (restore(pub_stream, extracted_raw, RAW, restored_raw, 0) != 0) {
       exit(1);
     }
     if (restored_raw->size != sec_stream->size ||
@@ -73,7 +73,7 @@ int main(void) {
     }
     extracted_b16->pos = 0;
     struct stream *restored_b16 = create_empty_stream();
-    if (restore(pub_stream, extracted_b16, BASE16, restored_b16, 78, 0) != 0) {
+    if (restore (pub_stream, extracted_b16, BASE16, restored_b16, 0) != 0) {
       exit(1);
     }
     if (restored_b16->size != sec_stream->size ||

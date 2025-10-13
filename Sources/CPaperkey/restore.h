@@ -28,6 +28,6 @@
 
 int restore(struct stream *pubring, struct stream *secrets,
             enum data_type input_type, struct stream *output,
-            unsigned int output_width, int ignore_crc_error);
+            int ignore_crc_error);
 
 #endif /* !_RESTORE_H_ */
