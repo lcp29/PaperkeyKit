@@ -43,7 +43,10 @@ let package = Package(
         ),
         .testTarget(
             name: "PaperkeyKitTests",
-            dependencies: ["PaperkeyKit"]
+            dependencies: ["PaperkeyKit"],
+            resources: [
+                .copy("checks")
+            ]
         )
     ],
 )
