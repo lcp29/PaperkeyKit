@@ -9,7 +9,7 @@ import Darwin
 import Foundation
 import CPaperkey
 
-class PaperkeyKit {
+public class PaperkeyKit {
     enum DataType {
         /// Automatically detect the data type
         case AUTO
