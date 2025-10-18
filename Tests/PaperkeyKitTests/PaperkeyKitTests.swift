@@ -50,14 +50,14 @@ struct PaperkeyKitTests {
         let pubData = try Data(contentsOf: pubURL)
         
         // Test raw binary format roundtrip
-        let extractedRaw = try #require(Paperkey.extract(input: secData, outputType: .RAW, outputWidth: 78))
-        let restoredRaw = try #require(Paperkey.restore(pubring: pubData, secrets: extractedRaw, inputType: .RAW, ignoreCRCError: false))
+        let extractedRaw = try #require(PaperkeyKit.extract(input: secData, outputType: .RAW, outputWidth: 78))
+        let restoredRaw = try #require(PaperkeyKit.restore(pubring: pubData, secrets: extractedRaw, inputType: .RAW, ignoreCRCError: false))
         
         #expect(restoredRaw == secData, "Raw binary roundtrip failed for \(keyType) key")
         
         // Test base16 text format roundtrip
-        let extractedBase16 = try #require(Paperkey.extract(input: secData, outputType: .BASE16, outputWidth: 78))
-        let restoredBase16 = try #require(Paperkey.restore(pubring: pubData, secrets: extractedBase16, inputType: .BASE16, ignoreCRCError: false))
+        let extractedBase16 = try #require(PaperkeyKit.extract(input: secData, outputType: .BASE16, outputWidth: 78))
+        let restoredBase16 = try #require(PaperkeyKit.restore(pubring: pubData, secrets: extractedBase16, inputType: .BASE16, ignoreCRCError: false))
         
         #expect(restoredBase16 == secData, "Base16 roundtrip failed for \(keyType) key")
     }
